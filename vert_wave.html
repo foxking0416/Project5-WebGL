@@ -18,34 +18,33 @@
 	
     uniform float u_time;
     uniform mat4 u_modelViewPerspective;
+
+	uniform vec4 u_colorHigh;
+	uniform vec4 u_colorLow;
 	varying vec4 color;
     
     void main(void)
     {
-		vec4 highestPtColor = vec4(1.0, 0.0, 0.0, 1.0);
-		vec4 lowestPtColor= vec4(0.0, 1.0, 0.0, 1.0);
 		float s_contrib = sin(position.x*2.0*3.14159 + u_time);
 		float t_contrib = cos(position.y*2.0*3.14159 + u_time);
       // NOTE : according to the WebGL standard, 0.0f is not accepted
 		float height = s_contrib*t_contrib;
-		color = lowestPtColor + (highestPtColor - lowestPtColor) * (height + 0.5) ;
+		color = u_colorLow + (u_colorHigh - u_colorLow) * (height + 0.5) ;
 
       // NOTE : gl_Position is always a vec4
-		  gl_Position = u_modelViewPerspective * vec4(vec3(position, height), 1.0);
+		gl_Position = u_modelViewPerspective * vec4(vec3(position, height), 1.0);
     }
 </script>
 
 <script id="fs" type="x-shader/x-fragment">
     precision mediump float;
 
-    uniform vec4 u_colorHigh;
-	uniform vec4 u_colorLow;
 
+	varying vec4 color;
 
     void main(void)
-    {
-      // NOTE : gl_FragColor is always a vec4
-		  gl_FragColor = u_colorHigh;
+	{
+		  gl_FragColor = color;
     }    
 </script>
 
@@ -54,7 +53,7 @@
   var positionLocation = 0;
   var heightLocation = 1;
   var u_modelViewPerspectiveLocation;
-  var u_color;
+  //var u_color;
   
   var heights;
   var numberOfIndices;
@@ -91,7 +90,7 @@
 
   var ColorObject = new function(){
     this.colorHigh = [ 0, 128, 255, 0.3 ]; // RGB with alpha
-	this.colorLow = [ 0, 128, 255, 0.3 ];
+	this.colorLow = [ 255, 128, 0, 0.3 ];
 	this.speed = 0.05;
   }
 
