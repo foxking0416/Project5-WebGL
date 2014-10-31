@@ -81,10 +81,10 @@
     // Add GUI component 
 
     var guiMinHeightColor = new dat.GUI();
-	var colorObjectMin = new ColorObject();
-	guiMinHeightColor.addColor(colorObjectMin, 'color');
-	guiMinHeightColor.addColor(colorObjectMin, 'color2');
-	guiMinHeightColor.add(colorObjectMin, 'speed', 0.01, 0.1);
+	//var colorObjectMin = new ColorObject();
+	guiMinHeightColor.addColor(ColorObject, 'color');
+	guiMinHeightColor.addColor(ColorObject, 'color2');
+	guiMinHeightColor.add(ColorObject, 'speed', 0.01, 0.1);
 	
 	
     init();
@@ -92,11 +92,10 @@
     animate();
   };
 
-  var ColorObject = function(){
-    this.color = [45, 133, 150], // RGB with alpha
-	this.color2= [45, 133, 150],
-	this.speed= 0.05
-
+  var ColorObject = {
+    color: [45, 133, 150], // RGB with alpha
+	color2: [45, 133, 150],
+	speed: 0.05
   };
 
 
@@ -135,8 +134,8 @@
 	
 	var test = [ 1.0, 1.0, 0.0, 1.0 ];
 	var test2 = ColorObject.color;
-	delta += 0.01;
-	//delta += ColorObject.speed;
+	//delta += 0.01;
+	delta += ColorObject.speed;
     // Render  
     context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
 
