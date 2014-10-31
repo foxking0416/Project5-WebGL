@@ -15,13 +15,20 @@
 
 <script id="vs" type="x-shader/x-vertex">
     attribute vec2 position;
-    
+	
+    uniform float u_time;
     uniform mat4 u_modelViewPerspective;
+	varying vec4 color;
     
     void main(void)
     {
+		vec4 highestPtColor = vec4(1.0, 0.0, 0.0, 1.0);
+		vec4 lowestPtColor= vec4(0.0, 1.0, 0.0, 1.0);
+		float s_contrib = sin(position.x*2.0*3.14159 + u_time);
+		float t_contrib = cos(position.y*2.0*3.14159 + u_time);
       // NOTE : according to the WebGL standard, 0.0f is not accepted
-		  float height = 0.0;
+		float height = s_contrib*t_contrib;
+		color = lowestPtColor + (highestPtColor - lowestPtColor) * (height + 0.5) ;
 
       // NOTE : gl_Position is always a vec4
 		  gl_Position = u_modelViewPerspective * vec4(vec3(position, height), 1.0);
@@ -32,6 +39,9 @@
     precision mediump float;
 
     uniform vec4 u_color;
+	uniform vec4 u_color1;
+	uniform vec4 u_color2;
+	varying vec4 color;
 
     void main(void)
     {
@@ -64,16 +74,31 @@
 
   var persp = mat4.create();
   var view = mat4.create();
+  var delta = 0;
     
   // Function called when the window is loaded
   window.onload = function() {
     // Add GUI component 
-    var gui = new dat.GUI();
 
+    var guiMinHeightColor = new dat.GUI();
+	var colorObjectMin = new ColorObject();
+	guiMinHeightColor.addColor(colorObjectMin, 'color');
+	guiMinHeightColor.addColor(colorObjectMin, 'color2');
+	guiMinHeightColor.add(colorObjectMin, 'speed', 0.01, 0.1);
+	
+	
     init();
 
     animate();
   };
+
+  var ColorObject = function(){
+    this.color = [45, 133, 150], // RGB with alpha
+	this.color2= [45, 133, 150],
+	this.speed= 0.05
+
+  };
+
 
   function init() {
     message = document.getElementById("message");
@@ -107,26 +132,39 @@
     mat4.multiply(view, model, mv);
     var mvp = mat4.create();
     mat4.multiply(persp, mv, mvp);
-
+	
+	var test = [ 1.0, 1.0, 0.0, 1.0 ];
+	var test2 = ColorObject.color;
+	delta += 0.01;
+	//delta += ColorObject.speed;
     // Render  
     context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
 
     context.uniformMatrix4fv(u_modelViewPerspectiveLocation, false, mvp); 
     context.drawElements(context.LINES, numberOfIndices, context.UNSIGNED_SHORT,0);
-
+	context.uniform1f(u_timeLocation, delta);
+	
+	var testColor = "#827b48";
+	//vec4 lowestPtColor= vec4(0.0, 1.0, 0.0, 1.0);
+	context.uniform4f(u_colorLocation, 0.0, 1.0, 0.0 , 1.0);
+	
+	//context.uniform4f(u_colorLocation, ColorObject.color);
     window.requestAnimFrame(animate);
   }
 
+  
   function initializeShader() {
     var program;
     var vs = getShaderSource(document.getElementById("vs"));
     var fs = getShaderSource(document.getElementById("fs"));
 
-		var program = createProgram(context, vs, fs, message);
-		context.bindAttribLocation(program, positionLocation, "position");
-		u_modelViewPerspectiveLocation = context.getUniformLocation(program,"u_modelViewPerspective");
+	var program = createProgram(context, vs, fs, message);//combine a vs and fs to a program
+	context.bindAttribLocation(program, positionLocation, "position");
+	u_modelViewPerspectiveLocation = context.getUniformLocation(program,"u_modelViewPerspective");
     u_colorLocation = context.getUniformLocation(program, "u_color");
-
+    u_timeLocation = context.getUniformLocation(program, "u_time")
+	u_colorLocation1 = context.getUniformLocation(program, "u_color1")
+	u_colorLocation2 = context.getUniformLocation(program, "u_color2")
     context.useProgram(program);
   }
 
@@ -205,6 +243,7 @@
     uploadMesh(positions, heights, indices);
     numberOfIndices = indices.length;
 }
+
 
 </script>
 
