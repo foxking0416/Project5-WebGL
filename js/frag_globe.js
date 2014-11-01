@@ -55,7 +55,14 @@
     var u_EarthSpecLocation;
     var u_BumpLocation;
     var u_timeLocation;
-
+	var u_BumpOnOffLocation;
+	var u_CloudShadowOnOffLocation;
+	var u_HeightShadeOnOffLocation;
+	var u_RimLightOnOffLocation;
+	var u_WaterRenderingLocation;
+	var u_GammaCorrectLocation;
+	var u_WindSpeedLocation;
+	
     (function initializeShader() {
         var vs = getShaderSource(document.getElementById("vs"));
         var fs = getShaderSource(document.getElementById("fs"));
@@ -76,7 +83,16 @@
         u_BumpLocation = gl.getUniformLocation(program,"u_Bump");
         u_timeLocation = gl.getUniformLocation(program,"u_time");
         u_CameraSpaceDirLightLocation = gl.getUniformLocation(program,"u_CameraSpaceDirLight");
-
+		u_BumpOnOffLocation = gl.getUniformLocation(program,"u_BumpOnOff");
+		u_CloudShadowOnOffLocation = gl.getUniformLocation(program,"u_CloudShadowOnOff");
+		u_HeightShadeOnOffLocation= gl.getUniformLocation(program,"u_HeightShadeOnOff");
+		u_RimLightOnOffLocation= gl.getUniformLocation(program,"u_RimLightOnOff");
+		u_WaterRenderingLocation= gl.getUniformLocation(program,"u_WaterRendering");
+		u_GammaCorrectLocation= gl.getUniformLocation(program,"u_GammaCorrect");
+		u_WindSpeedLocation= gl.getUniformLocation(program,"u_WindSpeed");
+		
+		
+		
         gl.useProgram(program);
     })();
 
@@ -232,7 +248,30 @@
     canvas.oncontextmenu = function(ev) {return false;};
     document.onmouseup = handleMouseUp;
     document.onmousemove = handleMouseMove;
+	
+	window.onload = function() {
+	    var gui = new dat.GUI();
+		gui.add(parameters, 'bump_mapping');
+		gui.add(parameters, 'cloud_shadow');
+		gui.add(parameters, 'water_rendering');
+		gui.add(parameters, 'height_shade');
+		gui.add(parameters, 'rim_light');
+		gui.add(parameters, 'gamma_correct',1.0, 2.0);
+		gui.add(parameters, 'wind_speed',0.01, 0.1);
 
+	};
+	
+    var parameters = new function(){
+
+
+		this.bump_mapping = true;
+		this.cloud_shadow = true;
+		this.water_rendering = true;
+		this.height_shade = true;
+		this.rim_light = true;
+		this.gamma_correct = 1.1;
+		this.wind_speed = 0.03;
+    }
 
     function animate() {
         ///////////////////////////////////////////////////////////////////////////
@@ -287,14 +326,41 @@
         gl.bindTexture(gl.TEXTURE_2D, specTex);
         gl.uniform1i(u_EarthSpecLocation, 5);
         gl.drawElements(gl.TRIANGLES, numberOfIndices, gl.UNSIGNED_SHORT,0);
+		if(parameters.bump_mapping == true)
+			gl.uniform1f(u_BumpOnOffLocation, 1);
+		else
+			gl.uniform1f(u_BumpOnOffLocation, 0);	
+			
+		if(parameters.cloud_shadow == true)
+			gl.uniform1f(u_CloudShadowOnOffLocation, 1);
+		else
+			gl.uniform1f(u_CloudShadowOnOffLocation, 0);	
 
+		if(parameters.water_rendering == true)
+			gl.uniform1f(u_WaterRenderingLocation, 1);
+		else
+			gl.uniform1f(u_WaterRenderingLocation, 0);	
+
+		if(parameters.rim_light == true)
+			gl.uniform1f(u_RimLightOnOffLocation, 1);
+		else
+			gl.uniform1f(u_RimLightOnOffLocation, 0);	
+
+		if(parameters.height_shade == true)
+			gl.uniform1f(u_HeightShadeOnOffLocation, 1);
+		else
+			gl.uniform1f(u_HeightShadeOnOffLocation, 0);
+
+		gl.uniform1f(u_WindSpeedLocation, parameters.wind_speed);
+		gl.uniform1f(u_GammaCorrectLocation, parameters.gamma_correct);			
+			
         time += 0.001;
 		gl.uniform1f(u_timeLocation, time);
         window.requestAnimFrame(animate);
     }
 
     var textureCount = 0;
-        
+
     function initializeTexture(texture, src) {
         texture.image = new Image();
         texture.image.onload = function() {
