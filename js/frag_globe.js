@@ -40,6 +40,7 @@
     var view = mat4.create();
     mat4.lookAt(eye, center, up, view);
 
+	var stats;
     var positionLocation;
     var normalLocation;
     var texCoordLocation;
@@ -258,12 +259,11 @@
 		gui.add(parameters, 'rim_light');
 		gui.add(parameters, 'gamma_correct',1.0, 2.0);
 		gui.add(parameters, 'wind_speed',0.01, 0.1);
-
+        
+		stats = initStats();
 	};
 	
     var parameters = new function(){
-
-
 		this.bump_mapping = true;
 		this.cloud_shadow = true;
 		this.water_rendering = true;
@@ -274,6 +274,8 @@
     }
 
     function animate() {
+		if(stats != undefined)
+			stats.update();
         ///////////////////////////////////////////////////////////////////////////
         // Update
 
@@ -356,6 +358,7 @@
 			
         time += 0.001;
 		gl.uniform1f(u_timeLocation, time);
+		
         window.requestAnimFrame(animate);
     }
 
@@ -380,4 +383,21 @@
     initializeTexture(transTex, "assets/earthtrans1024.png");
     initializeTexture(lightTex, "assets/earthlight1024.png");
     initializeTexture(specTex, "assets/earthspec1024.png");
+	
+	function initStats() {
+		stats = new Stats();
+		stats.setMode(0); // 0: fps, 1: ms
+
+		// Align top-left
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.left = '0px';
+		stats.domElement.style.top = '0px';
+
+		document.body.appendChild( stats.domElement );
+
+
+		return stats;
+	}
+
+	
 }());
