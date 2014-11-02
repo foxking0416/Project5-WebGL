@@ -11,8 +11,8 @@
         return [x,y,z];
     }
 
-    var NUM_WIDTH_PTS = 64;
-    var NUM_HEIGHT_PTS = 64;
+    var NUM_WIDTH_PTS = 256;
+    var NUM_HEIGHT_PTS = 256;
 
     var message = document.getElementById("message");
     var canvas = document.getElementById("canvas");
