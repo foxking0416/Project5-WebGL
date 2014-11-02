@@ -8,12 +8,14 @@ The center point of the grid will vibrate following a cos function. The surround
 however there is time offset and the height decreases as the distance to the center point increases.
 ![wave](result/wave.bmp)
 
-#Part 2 Globe
+#Part 2 Globe  
+
 Basic fatures:  
 * Rim Light
 * Specular on water
 * Bump mapping  
-#  
+  
+  
 Extra fatures:  
 * Clouds shadow
 * Height shade
