@@ -13,7 +13,8 @@ Basic fatures:
 * Rim Light
 * Specular on water
 * Bump mapping  
-Extra fatures:
+#  
+Extra fatures:  
 * Clouds shadow
 * Height shade
 * Water rendering
@@ -27,9 +28,9 @@ Extra fatures:
 * Rim light effect
 ![Add rim light](result/3.bmp)
 * Clouds Shadow  
-According to the light direction to offset the cloud's map and use the cloud's map to cover the color behind the could.
+According to the light direction to offset the cloud's map and use the cloud's map to cover the color behind the cloud.
 ![Add cloud shadow](result/4.bmp)
-* Height Shade  
+* Height Shape  
 Using bump map to set the vertex shader. I ever tried to set the vertex shader according to the real earth radius ratio. 
 However, the radius of earth is 6400 km and the highest mountain on earth is 8.8km. That means if I really set the vertex
 shader according to the real ratio, we could almost see nothing difference. Therefore, I used a modified ratio to set the vertex shader.
