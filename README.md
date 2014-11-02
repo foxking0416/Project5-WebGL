@@ -6,6 +6,10 @@ Basic fatures:
 * Rim Light
 * Specular on water
 * Bump mapping
+Extra fatures:
+* Clouds shadow
+* Height shade
+* Water rendering
 
 ![Title Image](result/0.bmp)
 
@@ -19,7 +23,7 @@ Basic fatures:
 
 
 **Clouds Shadow**
-![Add cloud shadpw](result/4.bmp)
+![Add cloud shadow](result/4.bmp)
 
 **Height Shade**
 ![Add height shade](result/5.bmp)
