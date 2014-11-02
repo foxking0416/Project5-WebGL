@@ -16,8 +16,8 @@
 <script id="vs" type="x-shader/x-vertex">
     attribute vec2 position;
 	
-	uniform float u_xdiv;
-	uniform float u_ydiv;
+	uniform float u_Height;
+	uniform float u_Div;
     uniform float u_time;
     uniform mat4 u_modelViewPerspective;
 
@@ -28,13 +28,13 @@
     void main(void)
     {
 		float dis = sqrt( (position.x-0.5)*(position.x-0.5) + (position.y-0.5)*(position.y-0.5) );
-		float c_contrib = cos(dis * u_ydiv * 2.0 * 3.14159 + u_time);
+		float c_contrib = cos(dis * u_Div * 2.0 * 3.14159 + u_time);
       // NOTE : according to the WebGL standard, 0.0f is not accepted
 		float height = c_contrib / (1.0 + 20.0 * dis);
-		color = u_colorLow + (u_colorHigh - u_colorLow) * (height + 0.5) ;
+		color = mix(u_colorLow, u_colorHigh, (height+1.0) / 2.0) ;
 
       // NOTE : gl_Position is always a vec4
-		gl_Position = u_modelViewPerspective * vec4(vec3(position, height), 1.0);
+		gl_Position = u_modelViewPerspective * vec4(vec3(position, height*u_Height), 1.0);
     }
 </script>
 
@@ -81,22 +81,22 @@
     
 	// Add GUI component 
     var gui = new dat.GUI();
-	gui.addColor(ColorObject, 'colorHigh');
-	gui.addColor(ColorObject, 'colorLow');
-	gui.add(ColorObject, 'speed', 0.01, 0.1);
-	gui.add(ColorObject, 'xdiv', 0.1, 10);
-	gui.add(ColorObject, 'ydiv', 0.1, 10);
+	gui.addColor(ColorObject, 'Color_High');
+	gui.addColor(ColorObject, 'Color_Low');
+	gui.add(ColorObject, 'Frequency', 0.01, 0.1);
+	gui.add(ColorObject, 'Height', 0.1, 5);
+	gui.add(ColorObject, 'Div', 0.1, 10);
 	
     init();
     animate();
   };
 
   var ColorObject = new function(){
-    this.colorHigh = [ 0, 128, 255, 0.3 ]; // RGB with alpha
-	this.colorLow = [ 255, 128, 0, 0.3 ];
-	this.speed = 0.05;
-	this.xdiv = 2.0;
-	this.ydiv = 2.0;
+    this.Color_High = [ 0, 128, 255, 0.3 ]; // RGB with alpha
+	this.Color_Low = [ 255, 128, 0, 0.3 ];
+	this.Frequency = 0.05;
+	this.Height = 2.0;
+	this.Div = 2.0;
   }
 
 
@@ -133,7 +133,7 @@
     var mvp = mat4.create();
     mat4.multiply(persp, mv, mvp);
 	
-	delta += ColorObject.speed;
+	delta += ColorObject.Frequency;
     // Render  
     context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
 
@@ -141,11 +141,11 @@
     context.drawElements(context.LINES, numberOfIndices, context.UNSIGNED_SHORT,0);
 	context.uniform1f(u_timeLocation, delta);
 	
-	context.uniform1f(u_xdivLocation, ColorObject.xdiv);
-	context.uniform1f(u_ydivLocation, ColorObject.ydiv);
+	context.uniform1f(u_HeightLocation, ColorObject.Height);
+	context.uniform1f(u_DivLocation, ColorObject.Div);
 	
-	context.uniform4f(u_colorLocationHigh, ColorObject.colorHigh[0]/255.0, ColorObject.colorHigh[1]/255.0, ColorObject.colorHigh[2]/255.0 , 1.0);
-	context.uniform4f(u_colorLocationLow, ColorObject.colorLow[0]/255.0, ColorObject.colorLow[1]/255.0, ColorObject.colorLow[2]/255.0 , 1.0);	
+	context.uniform4f(u_ColorHighLocation, ColorObject.Color_High[0]/255.0, ColorObject.Color_High[1]/255.0, ColorObject.Color_High[2]/255.0 , 1.0);
+	context.uniform4f(u_ColorLowLocation, ColorObject.Color_Low[0]/255.0, ColorObject.Color_Low[1]/255.0, ColorObject.Color_Low[2]/255.0 , 1.0);	
 
     window.requestAnimFrame(animate);
   }
@@ -161,10 +161,10 @@
 	u_modelViewPerspectiveLocation = context.getUniformLocation(program,"u_modelViewPerspective");
 
     u_timeLocation = context.getUniformLocation(program, "u_time");
-	u_xdivLocation = context.getUniformLocation(program, "u_xdiv");
-	u_ydivLocation = context.getUniformLocation(program, "u_ydiv");
-	u_colorLocationHigh = context.getUniformLocation(program, "u_colorHigh");
-	u_colorLocationLow = context.getUniformLocation(program, "u_colorLow");
+	u_HeightLocation = context.getUniformLocation(program, "u_Height");
+	u_DivLocation = context.getUniformLocation(program, "u_Div");
+	u_ColorHighLocation = context.getUniformLocation(program, "u_colorHigh");
+	u_ColorLowLocation = context.getUniformLocation(program, "u_colorLow");
 
     context.useProgram(program);
   }
